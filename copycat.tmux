@@ -5,6 +5,8 @@ CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$CURRENT_DIR/scripts/variables.sh"
 source "$CURRENT_DIR/scripts/helpers.sh"
 source "$CURRENT_DIR/scripts/stored_search_helpers.sh"
+source "$CURRENT_DIR/scripts/keytable_helpers.sh"
+
 
 # this function defines default stored searches
 set_default_stored_searches() {
@@ -32,6 +34,7 @@ set_default_stored_searches() {
 }
 
 set_start_bindings() {
+	local keytable_args="$(get_keytable_arguments)"
 	set_default_stored_searches
 	local stored_search_vars="$(stored_search_vars)"
 	local search_var
@@ -40,7 +43,7 @@ set_start_bindings() {
 	for search_var in $stored_search_vars; do
 		key="$(get_stored_search_key "$search_var")"
 		pattern="$(get_stored_search_pattern "$search_var")"
-		tmux bind-key "$key" run-shell "$CURRENT_DIR/scripts/copycat_mode_start.sh '$pattern'"
+		tmux bind-key ${keytable_args[@]} "$key" run-shell "$CURRENT_DIR/scripts/copycat_mode_start.sh '$pattern'"
 	done
 }
 
@@ -53,10 +56,11 @@ set_copycat_search_binding() {
 }
 
 set_copycat_git_special_binding() {
+	local keytable_args="$(get_keytable_arguments)"
 	local key_bindings=$(get_tmux_option "$copycat_git_search_option" "$default_git_search_key")
 	local key
 	for key in $key_bindings; do
-		tmux bind-key "$key" run-shell "$CURRENT_DIR/scripts/copycat_git_special.sh #{pane_current_path}"
+		tmux bind-key ${keytable_args[@]} "$key" run-shell "$CURRENT_DIR/scripts/copycat_git_special.sh #{pane_current_path}"
 	done
 }
 
